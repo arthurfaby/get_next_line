@@ -6,12 +6,11 @@
 /*   By: afaby <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/06 14:13:57 by afaby             #+#    #+#             */
-/*   Updated: 2022/04/06 18:45:32 by afaby            ###   ########.fr       */
+/*   Updated: 2022/04/10 15:34:49 by afaby            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
-#include <stdio.h>
 
 void	ft_bzero(void *s, size_t n)
 {
@@ -27,63 +26,65 @@ void	ft_bzero(void *s, size_t n)
 	}
 }
 
-void	*ft_calloc(size_t nmemb, size_t size)
-{
-	void	*res;
-
-	res = malloc(nmemb * size);
-	if (res == NULL)
-		return (NULL);
-	ft_bzero(res, nmemb * size);
-	return (res);
-}
-
-int	ft_strlen(const char *s)
+int	ft_strlen(const char *str)
 {
 	int	len;
 
 	len = 0;
-	if (!s)
-		return (0);
-	while (s[len] != '\0')
-	{
+	while (str[len])
 		len++;
-	}
 	return (len);
 }
 
-char	*ft_strcat(char *dest, char *src)
+void	ft_strcat(char *dest, const char *src)
 {
-	int	i;
-	int	j;
+	int		i;
+	int		j;
+	char	*tmp;
 
+	tmp = (char *)src;
 	i = 0;
 	j = 0;
-	if (!dest || !src)
-		return (0);
-	while (*(dest + i) != '\0')
+	while (dest[i] != '\0')
 		i++;
-	while (*(src + j) != '\0')
+	while (tmp[j] != '\0')
 	{
-		*(dest + i) = *(src + j);
+		dest[i] = tmp[j];
 		i++;
 		j++;
 	}
-	*(dest + i) = '\0';
-	return (dest);
+	dest[i] = '\0';
 }
 
-char	*ft_realloc(char *str, int n)
+char	*ft_strjoin(char const *s1, char const *s2)
 {
 	char	*res;
-	int		len;
 
-	if (!str)
-		len = 0;
-	else
-		len = ft_strlen(str);
-	res = ft_calloc(1, len + n + 1);
-	ft_strcat(res, str);
-	free(str);
+	if (!s1 || !s2)
+		return (NULL);
+	res = malloc(ft_strlen(s1) + ft_strlen(s2) + 1);
+	if (res == NULL)
+		return (NULL);
+	ft_bzero(res, ft_strlen(s1) + ft_strlen(s2) + 1);
+	ft_strcat(res, s1);
+	ft_strcat(res, s2);
 	return (res);
+}
+
+char	*ft_strdup(const char *s)
+{
+	char	*dest;
+	int		i;
+
+	dest = malloc(ft_strlen(s) * sizeof(char) + 1);
+	if (dest == NULL)
+		return (NULL);
+	i = 0;
+	while (*(s + i))
+	{
+		*(dest + i) = *(s + i);
+		i++;
+	}
+	*(dest + i) = '\0';
+	return (dest);
 }

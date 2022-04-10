@@ -3,48 +3,100 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: afaby <marvin@42.fr>                       +#+  +:+       +#+        */
+/*   By: afaby <afaby@student.42angouleme.fr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/04/06 11:39:48 by afaby             #+#    #+#             */
-/*   Updated: 2022/04/06 18:51:06 by afaby            ###   ########.fr       */
+/*   Created: 2022/04/09 17:10:27 by afaby             #+#    #+#             */
+/*   Updated: 2022/04/10 16:14:29 by afaby            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
-#include <stdio.h>
+
+int	c_in_str(char *str, char c)
+{
+	while (*str)
+	{
+		if (*str == c)
+			return (1);
+		str++;
+	}
+	return (0);
+}
+
+char	*cut_str(char *to_read)
+{
+	int		i;
+	char	*res;
+	int		j;
+
+	i = 0;
+	while (to_read[i] && to_read[i] != '\n')
+		i++;
+	if (to_read[i] == '\n')
+		i++;
+	res = malloc(sizeof(char) * (ft_strlen(to_read) - i + 1));
+	if (!res)
+		return (NULL);
+	j = -1;
+	while (to_read[i + ++j])
+		res[j] = to_read[i + j];
+	res[j] = '\0';
+	free(to_read);
+	return (res);
+}
+
+char	*get_subline(char *to_read)
+{
+	int		i;
+	int		j;
+	char	*res;
+
+	i = 0;
+	while (to_read[i] && to_read[i] != '\n')
+		i++;
+	if (to_read[i] == '\n')
+		i++;
+	j = 0;
+	res = malloc(sizeof(char) * (i + 1));
+	if (!res)
+		return (NULL);
+	while (j < i)
+	{
+		res[j] = to_read[j];
+		j++;
+	}
+	res[j] = '\0';
+	return (res);
+}
 
 char	*get_next_line(int fd)
 {
-	char		*res;
-	char		buf_c[1];
-	char		buf[BUFFER_SIZE + 1];
 	int			ret;
-	int			i;
+	char		*buf;
+	static char	*to_read = NULL;
+	char		*res;
 
-	ret = read(fd, buf_c, 1);
-	res = ft_calloc(1, 1);
-	res[0] = '\0';
-	if (ret < 1)
-		return (0);
-	i = 0;
-	while (ret > 0)
+	buf = malloc(BUFFER_SIZE + 1);
+	ret = -42;
+	while (ret != 0 && !c_in_str(buf, '\n'))
 	{
-		buf[i] = buf_c[0];
-		buf[i + 1] = '\0';
-		if (!buf_c[0] || buf_c[0] == '\n')
+		if (ret != -42)
+			buf[ret] = '\0';
+		if (!to_read)
 		{
-			res = ft_realloc(res, ft_strlen(buf));
-			ft_strcat(res, buf);
-			break;
+			ret = read(fd, buf, BUFFER_SIZE);
+			if (ret < 1)
+				return (NULL);
+			to_read = ft_strdup(buf);
 		}
-		else if (buf[BUFFER_SIZE] == '\0')
-		{
-			res = ft_realloc(res, ft_strlen(buf));
-			ft_strcat(res, buf);
-			i = -1;
-		}
-		ret = read(fd, buf_c, 1);
-		i++;
+		else if (ret != -42)
+			to_read = ft_strjoin(to_read, buf);
+		ret = read(fd, buf, BUFFER_SIZE);
 	}
+	res = get_subline(to_read);
+	to_read = cut_str(to_read);
+	if (*res == '\0')
+		return (NULL);
+	free(buf);
 	return (res);
 }
