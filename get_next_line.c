@@ -6,97 +6,99 @@
 /*   By: afaby <afaby@student.42angouleme.fr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/09 17:10:27 by afaby             #+#    #+#             */
-/*   Updated: 2022/04/10 16:14:29 by afaby            ###   ########.fr       */
+/*   Updated: 2022/04/10 22:26:26 by afaby            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-int	c_in_str(char *str, char c)
-{
-	while (*str)
-	{
-		if (*str == c)
-			return (1);
-		str++;
-	}
-	return (0);
-}
-
-char	*cut_str(char *to_read)
+char	*cut_str(char *to_process)
 {
 	int		i;
 	char	*res;
 	int		j;
 
 	i = 0;
-	while (to_read[i] && to_read[i] != '\n')
+	while (to_process[i] && to_process[i] != '\n')
 		i++;
-	if (to_read[i] == '\n')
-		i++;
-	res = malloc(sizeof(char) * (ft_strlen(to_read) - i + 1));
+	if (to_process[i] == 0)
+	{
+		free(to_process);
+		return (0);
+	}
+	res = malloc(ft_strlen(to_process) - i + 1);
 	if (!res)
 		return (NULL);
-	j = -1;
-	while (to_read[i + ++j])
-		res[j] = to_read[i + j];
-	res[j] = '\0';
-	free(to_read);
-	return (res);
-}
-
-char	*get_subline(char *to_read)
-{
-	int		i;
-	int		j;
-	char	*res;
-
-	i = 0;
-	while (to_read[i] && to_read[i] != '\n')
-		i++;
-	if (to_read[i] == '\n')
-		i++;
+	i++;
 	j = 0;
-	res = malloc(sizeof(char) * (i + 1));
+	while (to_process[i])
+		res[j++] = to_process[i++];
+	res[j] = 0;
+	free(to_process);
+	return (res);
+}
+
+char	*get_subline(char *to_process)
+{
+	int		i;
+	char	*res;
+
+	i = 0;
+	if (!*to_process)
+		return (0);
+	while (to_process[i] && to_process[i] != '\n')
+		i++;
+	res = malloc(sizeof(char) * (i + 2));
 	if (!res)
 		return (NULL);
-	while (j < i)
+	i = 0;
+	while (to_process[i] && to_process[i] != '\n')
 	{
-		res[j] = to_read[j];
-		j++;
+		res[i] = to_process[i];
+		i++;
 	}
-	res[j] = '\0';
+	if (to_process[i] == '\n')
+	{
+		res[i] = to_process[i];
+		i++;
+	}
+	res[i] = '\0';
 	return (res);
+}
+
+char	*ft_read(int fd, char *to_process)
+{
+	char	*buf;
+	int		ret;
+
+	buf = malloc(sizeof(char) * (BUFFER_SIZE + 1));
+	if (!buf)
+		return (NULL);
+	ret = 1;
+	while (!ft_strchr(to_process, '\n') && ret != 0)
+	{
+		ret = read(fd, buf, BUFFER_SIZE);
+		if (ret < 0)
+		{
+			free(buf);
+			return (0);
+		}
+		buf[ret] = 0;
+		to_process = ft_strjoin(to_process, buf);
+	}
+	free(buf);
+	return (to_process);
 }
 
 char	*get_next_line(int fd)
 {
-	int			ret;
-	char		*buf;
-	static char	*to_read = NULL;
+	static char	*to_process;
 	char		*res;
 
-	buf = malloc(BUFFER_SIZE + 1);
-	ret = -42;
-	while (ret != 0 && !c_in_str(buf, '\n'))
-	{
-		if (ret != -42)
-			buf[ret] = '\0';
-		if (!to_read)
-		{
-			ret = read(fd, buf, BUFFER_SIZE);
-			if (ret < 1)
-				return (NULL);
-			to_read = ft_strdup(buf);
-		}
-		else if (ret != -42)
-			to_read = ft_strjoin(to_read, buf);
-		ret = read(fd, buf, BUFFER_SIZE);
-	}
-	res = get_subline(to_read);
-	to_read = cut_str(to_read);
-	if (*res == '\0')
-		return (NULL);
-	free(buf);
+	to_process = ft_read(fd, to_process);
+	if (!to_process)
+		return (0);
+	res = get_subline(to_process);
+	to_process = cut_str(to_process);
 	return (res);
 }

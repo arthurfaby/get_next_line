@@ -6,7 +6,7 @@
 /*   By: afaby <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/06 11:26:05 by afaby             #+#    #+#             */
-/*   Updated: 2022/04/10 14:36:32 by afaby            ###   ########.fr       */
+/*   Updated: 2022/04/10 22:23:55 by afaby            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,10 +19,12 @@
 # include <stdlib.h>
 # include <unistd.h>
 # include <stdio.h>
+# include <stddef.h>
 
 char	*get_next_line(int fd);
-char	*ft_strjoin(char const *s1, char const *s2);
-int		ft_strlen(const char *s);
+char	*ft_strjoin(char *s1, char *s2);
+size_t	ft_strlen(char *s);
 char	*ft_strdup(const char *s);
+char	*ft_strchr(char *s, int c);
 
 #endif
