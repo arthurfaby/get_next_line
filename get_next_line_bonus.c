@@ -6,11 +6,11 @@
 /*   By: afaby <afaby@student.42angouleme.fr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/09 17:10:27 by afaby             #+#    #+#             */
-/*   Updated: 2022/04/11 10:20:42 by afaby            ###   ########.fr       */
+/*   Updated: 2022/04/11 19:22:58 by afaby            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line_bonus.h"
+#include "get_next_line.h"
 
 char	*cut_str(char *to_process)
 {
@@ -66,16 +66,18 @@ char	*get_subline(char *to_process)
 	return (res);
 }
 
-char	*ft_read(int fd, char *to_process)
+char	*get_next_line(int fd)
 {
-	char	*buf;
-	int		ret;
+	char		*res;
+	static char	*to_process[1025];
+	char		*buf;
+	int			ret;
 
 	buf = malloc(sizeof(char) * (BUFFER_SIZE + 1));
 	if (!buf)
-		return (NULL);
+		return (0);
 	ret = 1;
-	while (!ft_strchr(to_process, '\n') && ret != 0)
+	while (ret && !ft_strchr(to_process[fd], '\n'))
 	{
 		ret = read(fd, buf, BUFFER_SIZE);
 		if (ret < 0)
@@ -83,21 +85,10 @@ char	*ft_read(int fd, char *to_process)
 			free(buf);
 			return (0);
 		}
-		buf[ret] = 0;
-		to_process = ft_strjoin(to_process, buf);
+		buf[ret] = '\0';
+		to_process[fd] = ft_strjoin(to_process[fd], buf);
 	}
 	free(buf);
-	return (to_process);
-}
-
-char	*get_next_line(int fd)
-{
-	static char	*to_process[1025];
-	char		*res;
-
-	to_process[fd] = ft_read(fd, to_process[fd]);
-	if (!to_process[fd])
-		return (0);
 	res = get_subline(to_process[fd]);
 	to_process[fd] = cut_str(to_process[fd]);
 	return (res);
