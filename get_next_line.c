@@ -6,7 +6,7 @@
 /*   By: afaby <afaby@student.42angouleme.fr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/09 17:10:27 by afaby             #+#    #+#             */
-/*   Updated: 2022/04/11 19:19:50 by afaby            ###   ########.fr       */
+/*   Updated: 2022/04/12 10:07:54 by afaby            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,8 +76,9 @@ char	*get_next_line(int fd)
 	buf = malloc(sizeof(char) * (BUFFER_SIZE + 1));
 	if (!buf)
 		return (0);
+	*buf = '\0';
 	ret = 1;
-	while (ret && !ft_strchr(to_process, '\n'))
+	while (ret && !ft_strchr(buf, '\n'))
 	{
 		ret = read(fd, buf, BUFFER_SIZE);
 		if (ret < 0)

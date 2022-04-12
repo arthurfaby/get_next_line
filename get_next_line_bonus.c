@@ -6,7 +6,7 @@
 /*   By: afaby <afaby@student.42angouleme.fr>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/09 17:10:27 by afaby             #+#    #+#             */
-/*   Updated: 2022/04/11 19:22:58 by afaby            ###   ########.fr       */
+/*   Updated: 2022/04/12 11:38:52 by afaby            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,20 +48,16 @@ char	*get_subline(char *to_process)
 		return (0);
 	while (to_process[i] && to_process[i] != '\n')
 		i++;
-	res = malloc(sizeof(char) * (i + 2));
+	if (to_process[i] == '\n')
+		i++;
+	res = malloc(sizeof(char) * (i + 1));
 	if (!res)
 		return (NULL);
-	i = 0;
-	while (to_process[i] && to_process[i] != '\n')
-	{
+	i = -1;
+	while (to_process[++i] && to_process[i] != '\n')
 		res[i] = to_process[i];
-		i++;
-	}
 	if (to_process[i] == '\n')
-	{
-		res[i] = to_process[i];
-		i++;
-	}
+		res[i++] = '\n';
 	res[i] = '\0';
 	return (res);
 }
